@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animations/ui/detail_nft_screen.dart';
 import 'package:flutter_animations/ui/widgets/app_bar.dart';
 import 'package:flutter_animations/ui/widgets/blured_circle.dart';
 import 'package:flutter_animations/ui/widgets/image_list.dart';
 import 'package:flutter_animations/utils/utils.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter_svg/svg.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,6 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Size size;
+  var itemCount = 10;
 
   @override
   void initState() {
@@ -92,11 +95,13 @@ class _HomePageState extends State<HomePage> {
                                 removeTop: true,
                                 child: ListView.builder(
                                     shrinkWrap: true,
-                                    itemCount: 5,
+                                    itemCount: itemCount,
                                     physics:
                                         const NeverScrollableScrollPhysics(),
                                     itemBuilder: (context, index) =>
-                                        ImageItemWidget(index: index)),
+                                        ImageItemWidget(
+                                            index: index,
+                                            avatarIndex: itemCount - index)),
                               ),
                             ),
                           ),
@@ -111,34 +116,112 @@ class _HomePageState extends State<HomePage> {
 }
 
 class ImageItemWidget extends StatelessWidget {
-  const ImageItemWidget({Key? key, required this.index}) : super(key: key);
+  const ImageItemWidget(
+      {Key? key, required this.index, required this.avatarIndex})
+      : super(key: key);
 
   final int index;
+  final int avatarIndex;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-          color: darkColor, borderRadius: BorderRadius.circular(20)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(20)),
-              child: Image.asset(
-                'assets/nfts/${index + 1}.png',
-                height: 150,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              )),
-          Text(
-            'Chromium Ape #SDS$index',
-            style: globalTextStyle(
-                color: Colors.white, fontWeight: FontWeight.w500, fontSize: 20),
-          ),
-        ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => NFTScreen(image: 'assets/nfts/${index + 1}.png')),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+            color: darkColor, borderRadius: BorderRadius.circular(20)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
+                child: Hero(
+                  tag: 'assets/nfts/${index + 1}.png',
+                  child: Image.asset(
+                    'assets/nfts/${index + 1}.png',
+                    height: 150,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                )),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Chromium Ape #SDS$index',
+                    style: globalTextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16),
+                  ),
+                  Divider(color: lightColor),
+                  Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Creator',
+                              style: globalTextStyle(
+                                  color: Colors.white38, fontSize: 12)),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 16,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(100),
+                                  child: Image.asset(
+                                    'assets/nfts/$avatarIndex.png',
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text('@X${index}2H3bv${index}...',
+                                  style: globalTextStyle(
+                                      fontSize: 13, color: Colors.white)),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Current bid',
+                              style: globalTextStyle(
+                                  color: Colors.white38, fontSize: 12)),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              SvgPicture.asset('assets/svg/eth_logo.svg',
+                                  height: 20),
+                              const SizedBox(width: 8),
+                              Text('${((index + 1) * 3) - index} ETH',
+                                  style: globalTextStyle(
+                                      fontSize: 13, color: Colors.white)),
+                            ],
+                          ),
+                        ],
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
